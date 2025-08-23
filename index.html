@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loldle Classic — Solver (Vanilla JS)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Loldle Classic — Solver</h1>
+    <div class="header-actions">
+      <label class="toggle">
+        <input type="checkbox" id="onlyCandidates" checked />
+        <span>Tylko kandydaci</span>
+      </label>
+      <button id="resetBtn" class="secondary">Reset sesji</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Nowa próba</h2>
+      <div class="row">
+        <label for="guessInput">Champion</label>
+        <input id="guessInput" list="championsList" placeholder="np. Aatrox" autocomplete="off" />
+        <datalist id="championsList"></datalist>
+      </div>
+
+      <div class="feedback-grid">
+        <div class="fb-field">
+          <div class="fb-label">Płeć</div>
+          <button class="fb-cycle" data-field="gender" title="Kliknij, aby zmieniać: ✅ → 🟧 → ❌">•</button>
+        </div>
+        <div class="fb-field">
+          <div class="fb-label">Pozycje</div>
+          <button class="fb-cycle" data-field="positions" title="Kliknij, aby zmieniać: ✅ → 🟧 → ❌">•</button>
+        </div>
+        <div class="fb-field">
+          <div class="fb-label">Gatunek</div>
+          <button class="fb-cycle" data-field="species" title="Kliknij, aby zmieniać: ✅ → 🟧 → ❌">•</button>
+        </div>
+        <div class="fb-field">
+          <div class="fb-label">Zasób</div>
+          <button class="fb-cycle" data-field="resource" title="Kliknij, aby zmieniać: ✅ → 🟧 → ❌">•</button>
+        </div>
+        <div class="fb-field">
+          <div class="fb-label">Zasięg</div>
+          <button class="fb-cycle" data-field="rangeType" title="Kliknij, aby zmieniać: ✅ → 🟧 → ❌">•</button>
+        </div>
+        <div class="fb-field">
+          <div class="fb-label">Regiony</div>
+          <button class="fb-cycle" data-field="regions" title="Kliknij, aby zmieniać: ✅ → 🟧 → ❌">•</button>
+        </div>
+        <div class="fb-field">
+          <div class="fb-label">Rok</div>
+          <button class="fb-cycle-year" data-field="releaseYear" title="Kliknij, aby zmieniać: ✅ → ❌🔽 → ❌🔼">•</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="submitGuess" class="primary">Zatwierdź próbę</button>
+      </div>
+      <p class="hint">
+        Wskazówka: klikaj kropki, by ustawić feedback zgodnie z Loldle. Rok: ✅ / ❌🔽 / ❌🔼 (pętla).
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>TOP 3 następne guessy</h2>
+      <ol id="top3"></ol>
+      <p id="uniformP" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>Aktualni kandydaci <span class="muted" id="candCount"></span></h2>
+      <div id="candidates" class="candidates"></div>
+    </section>
+
+    <section class="card">
+      <h2>Historia</h2>
+      <div id="history"></div>
+    </section>
+  </main>
+
+  
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

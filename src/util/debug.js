@@ -1,5 +1,4 @@
-// Simple debug utility
-export const DEBUG = true; // ustaw na false, by wyciszyć logi
+export const DEBUG = true;
 export const D = {
   log: (...args) => { if (DEBUG) console.log('[LOLDLE]', ...args); },
   warn: (...args) => { if (DEBUG) console.warn('[LOLDLE]', ...args); },

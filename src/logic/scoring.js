@@ -2,12 +2,12 @@ import { computePattern, patternKey } from './patterns.js';
 import { D } from '../util/debug.js';
 
 /**
- * Rank guesses by expected remaining candidate size using partitioning of current candidates by feedback pattern.
- * Lower is better.
- * @param {Champ[]} candidates - current possible targets
- * @param {Champ[]} universe   - allowed guesses universe
- * @param {boolean} onlyCandidates
- * @returns {{champ: Champ, score: number}[]}
+ * Ranks possible guesses by their expected remaining candidate size.
+ * A lower score is better, indicating a guess that is more likely to reduce the candidate pool.
+ * @param {Champ[]} candidates - The current list of possible target champions.
+ * @param {Champ[]} universe - The full list of all possible champions.
+ * @param {boolean} onlyCandidates - If true, guesses are ranked from the `candidates` pool; otherwise, from the `universe`.
+ * @returns {{champ: Champ, score: number}[]} A sorted array of guess rankings.
  */
 export function rankGuesses(candidates, universe, onlyCandidates=true) {
   const N = candidates.length;

@@ -2,11 +2,11 @@ import { computePattern, patternKey } from './patterns.js';
 import { D } from '../util/debug.js';
 
 /**
- * Given history (guess+feedback) keep only champions that would have produced
- * exactly the same feedback if they were the hidden target.
- * @param {Champ[]} all
- * @param {HistoryEntry[]} history
- * @returns {Champ[]}
+ * Filters the list of all champions based on the game's history.
+ * It keeps only those champions that would have produced the same feedback for all past guesses.
+ * @param {Champ[]} all - The full list of all champions.
+ * @param {HistoryEntry[]} history - The history of guesses and feedback.
+ * @returns {Champ[]} An array of champions that are still candidates.
  */
 export function filterCandidates(all, history) {
   if (history.length === 0) return [...all];
@@ -16,7 +16,7 @@ export function filterCandidates(all, history) {
   const out = all.filter(target => {
     for (const h of history) {
       const g = byKey.get(h.guessKey);
-      if (!g) return false; // unknown guess
+      if (!g) return false;
       const pat = computePattern(g, target);
       if (patternKey(pat) !== patternKey(h.feedback)) return false;
     }

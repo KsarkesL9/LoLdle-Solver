@@ -17,7 +17,6 @@ async function main() {
   const { readFeedback, reset } = initFeedbackControls(document);
   D.log('Feedback controls ready');
 
-  // udostępniamy do UI
   window.__readFeedback = readFeedback;
   window.__resetFeedback = reset;
 
@@ -38,7 +37,6 @@ async function main() {
 
   renderer.recompute(getState);
 
-  // synchronizacja przełącznika po starcie (dla pewności)
   document.getElementById('onlyCandidates').checked = !!getState().onlyCandidates;
 }
 

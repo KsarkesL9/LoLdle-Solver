@@ -91,7 +91,6 @@ export function initAutocomplete(inputEl, champs) {
     }
   });
   inputEl.addEventListener('blur', () => {
-    // delay so mousedown can fire
     setTimeout(clear, 100);
   });
 

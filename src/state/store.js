@@ -6,7 +6,10 @@ const defaultState = {
   onlyCandidates: true,
 };
 
-/** @returns {{history: HistoryEntry[], onlyCandidates: boolean}} */
+/**
+ * Loads the application state from local storage.
+ * @returns {{history: HistoryEntry[], onlyCandidates: boolean}} The loaded state or default state if not found.
+ */
 export function loadState() {
   try {
     const raw = localStorage.getItem(KEY);
@@ -18,7 +21,11 @@ export function loadState() {
   }
 }
 
-/** @param {Partial<typeof defaultState>} patch */
+/**
+ * Saves a partial state object to local storage.
+ * @param {Partial<typeof defaultState>} patch - A partial object with state properties to update.
+ * @returns {{history: HistoryEntry[], onlyCandidates: boolean}} The updated state.
+ */
 export function saveState(patch) {
   const cur = loadState();
   const next = { ...cur, ...patch };
@@ -26,7 +33,7 @@ export function saveState(patch) {
   return next;
 }
 
-/** Reset session */
+/** Resets the application state by clearing local storage. */
 export function clearState() {
   localStorage.removeItem(KEY);
 }

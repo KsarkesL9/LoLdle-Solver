@@ -3,7 +3,10 @@ import { filterCandidates } from '../logic/filter.js';
 import { initAutocomplete } from './autocomplete.js';
 import { D } from '../util/debug.js';
 
-/** @param {Champ[]} champs */
+/**
+ * Populates the datalist element for champion autocomplete.
+ * @param {Champ[]} champs - The list of all champion objects.
+ */
 export function populateDatalist(champs) {
   const dl = document.getElementById('championsList');
   dl.innerHTML = '';
@@ -14,14 +17,24 @@ export function populateDatalist(champs) {
   }
 }
 
-/** @param {Champ[]} champs */
+/**
+ * Creates a map for quick lookup of champions by their display name.
+ * @param {Champ[]} champs - The list of all champion objects.
+ * @returns {Map<string, Champ>} A map from normalized display name to champion object.
+ */
 function indexByDisplay(champs) {
   const m = new Map();
   for (const c of champs) m.set(c.nameDisplay.toLowerCase(), c);
   return m;
 }
 
-/** @param {Champ[]} champs @param {() => any} getState @param {(p: any)=>void} setState */
+/**
+ * Initializes all UI handlers and returns a recompute function.
+ * @param {Champ[]} champs - The list of all champion objects.
+ * @param {() => any} getState - Function to get the current application state.
+ * @param {(p: any) => void} setState - Function to update the application state.
+ * @returns {{recompute: Function}} An object containing the `recompute` function.
+ */
 export function initUIHandlers(champs, getState, setState) {
   const byDisplay = indexByDisplay(champs);
 

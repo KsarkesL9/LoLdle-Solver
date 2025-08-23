@@ -13,13 +13,22 @@ function iconFor(state, isYear=false) {
   return '•';
 }
 
-/** @param {HTMLElement} btn @param {boolean} isYear */
+/**
+ * Sets the state and icon for a feedback button.
+ * @param {HTMLElement} btn - The button element.
+ * @param {string} state - The new state ('green', 'orange', etc.).
+ * @param {boolean} isYear - True if it's a year feedback button.
+ */
 function setState(btn, state, isYear=false) {
   btn.dataset.state = state;
   btn.textContent = iconFor(state, isYear);
 }
 
-/** Initialize feedback buttons; returns a function to read the current feedback state. */
+/**
+ * Initializes feedback buttons and returns functions to manage their state.
+ * @param {Document|HTMLElement} root - The root element to search for buttons.
+ * @returns {{readFeedback: Function, reset: Function}} An object with functions to read and reset the feedback state.
+ */
 export function initFeedbackControls(root=document) {
   const triBtns = Array.from(root.querySelectorAll('.fb-cycle'));
   const yearBtns = Array.from(root.querySelectorAll('.fb-cycle-year'));
@@ -44,6 +53,10 @@ export function initFeedbackControls(root=document) {
     });
   });
 
+  /**
+   * Reads the current state of all feedback buttons.
+   * @returns {Feedback} A Feedback object representing the current state.
+   */
   function readFeedback() {
     /** @type {Feedback} */
     const fb = {
@@ -66,6 +79,7 @@ export function initFeedbackControls(root=document) {
     return fb;
   }
 
+  /** Resets all feedback buttons to their initial 'unset' state. */
   function reset() {
     D.log('Reset feedback controls');
     triBtns.forEach(btn => setState(btn, 'unset'));

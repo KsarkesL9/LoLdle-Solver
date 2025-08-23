@@ -1,9 +1,13 @@
 import { toDisplayName, toKeyName } from '../util/normalize.js';
 
-/** @returns {Promise<Champ[]>} */
+/**
+ * Loads champion data from a JSON file and formats it into a structured array.
+ * @param {string} url - The URL of the champions JSON file.
+ * @returns {Promise<Champ[]>} A promise that resolves to an array of champion objects.
+ */
 export async function loadChampions(url = './champions.json') {
   const res = await fetch(url);
-  if (!res.ok) throw new Error('Nie można wczytać champions.json');
+  if (!res.ok) throw new Error('Failed to load champions data.');
   const raw = await res.json();
 
   return raw.map((c) => ({

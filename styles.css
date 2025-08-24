@@ -54,6 +54,43 @@ ol#top3 li { margin: .25rem 0; }
 .top-item { display:flex; align-items:center; gap:.5rem; }
 .top-item img { width:22px; height:22px; border-radius:5px; border:1px solid #1a2430; background:#091019; }
 
-.history-row { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; padding:.45rem .6rem; border:1px dashed #263245; border-radius:10px; margin:.4rem 0; }
+.history-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  align-items: center;
+  padding: .45rem .6rem;
+  border: 1px dashed #263245;
+  border-radius: 10px;
+  margin: .4rem 0;
+  position: relative; /* Dla pozycjonowania przycisku */
+  padding-right: 30px; /* Miejsce na przycisk */
+}
 .badge { font-size:.8rem; padding:.2rem .45rem; border-radius:8px; background:#0f141b; border:1px solid #1a2430; color:var(--muted); }
 .history-name { font-weight:600; }
+
+.undo-row-btn {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem;
+  line-height: 1;
+}
+.undo-row-btn:hover {
+  color: var(--bad);
+}
+
+#candidates-footer {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.load-more-btn {
+  width: 100%;
+}

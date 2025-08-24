@@ -14,7 +14,7 @@ async function main() {
   populateDatalist(champs);
   D.log('Datalist populated');
 
-  const { readFeedback, reset } = initFeedbackControls(document);
+  const { readFeedback, reset, setFeedback } = initFeedbackControls(document);
   D.log('Feedback controls ready');
 
   window.__readFeedback = readFeedback;
@@ -32,12 +32,10 @@ async function main() {
     renderer.recompute(getState);
   }
 
-  const renderer = initUIHandlers(champs, getState, setState);
+  const renderer = initUIHandlers(champs, getState, setState, setFeedback);
   D.groupEnd();
 
   renderer.recompute(getState);
-
-  document.getElementById('onlyCandidates').checked = !!getState().onlyCandidates;
 }
 
 main().catch(err => {

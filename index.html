@@ -10,10 +10,6 @@
   <header class="app-header">
     <h1>Loldle Classic — Solver</h1>
     <div class="header-actions">
-      <label class="toggle">
-        <input type="checkbox" id="onlyCandidates" checked />
-        <span>Tylko kandydaci</span>
-      </label>
       <button id="resetBtn" class="secondary">Reset sesji</button>
     </div>
   </header>
@@ -75,6 +71,7 @@
     <section class="card">
       <h2>Aktualni kandydaci <span class="muted" id="candCount"></span></h2>
       <div id="candidates" class="candidates"></div>
+      <div id="candidates-footer"></div>
     </section>
 
     <section class="card">
@@ -82,8 +79,6 @@
       <div id="history"></div>
     </section>
   </main>
-
-  
 
   <script type="module" src="src/main.js"></script>
 </body>

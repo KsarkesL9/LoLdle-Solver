@@ -3,6 +3,8 @@ import { filterCandidates } from '../logic/filter.js';
 import { initAutocomplete } from './autocomplete.js';
 import { D } from '../util/debug.js';
 
+const BATCH_SIZE = 20;
+
 /**
  * Populates the datalist element for champion autocomplete.
  * @param {Champ[]} champs - The list of all champion objects.
@@ -33,29 +35,27 @@ function indexByDisplay(champs) {
  * @param {Champ[]} champs - The list of all champion objects.
  * @param {() => any} getState - Function to get the current application state.
  * @param {(p: any) => void} setState - Function to update the application state.
+ * @param {(fb: Feedback) => void} setFeedback - Function to set the feedback controls.
  * @returns {{recompute: Function}} An object containing the `recompute` function.
  */
-export function initUIHandlers(champs, getState, setState) {
+export function initUIHandlers(champs, getState, setState, setFeedback) {
   const byDisplay = indexByDisplay(champs);
 
   const guessInput = /** @type {HTMLInputElement} */ (document.getElementById('guessInput'));
   const ac = initAutocomplete(guessInput, champs);
 
   const submitBtn = document.getElementById('submitGuess');
-  const onlyCandChk = /** @type {HTMLInputElement} */ (document.getElementById('onlyCandidates'));
   const resetBtn = document.getElementById('resetBtn');
 
-  onlyCandChk.checked = !!getState().onlyCandidates;
-  D.log('UI init onlyCandidates:', getState().onlyCandidates);
-  onlyCandChk.addEventListener('change', () => {
-    D.log('Toggle onlyCandidates ->', onlyCandChk.checked);
-    setState({ onlyCandidates: onlyCandChk.checked });
-  });
+  let displayedCount = BATCH_SIZE;
+  let currentCandidates = [];
 
   resetBtn.addEventListener('click', () => {
     if (confirm('Na pewno zresetować sesję?')) {
       D.warn('Reset session requested');
       setState({ history: [] });
+      window.__resetFeedback();
+      guessInput.value = '';
     }
   });
 
@@ -78,11 +78,7 @@ export function initUIHandlers(champs, getState, setState) {
     const uniformP = document.getElementById('uniformP');
     top3ol.innerHTML = '';
 
-    const s = getState();
-    D.log('renderTop3 candidates:', candidates.length, 'onlyCandidates:', s.onlyCandidates);
-    const universe = s.onlyCandidates ? candidates : champs;
-
-    const ranking = rankGuesses(candidates, universe, s.onlyCandidates).slice(0, 3);
+    const ranking = rankGuesses(candidates, candidates, true).slice(0, 3);
     D.log('Top3 ranking:', ranking.map(r => ({ name: r.champ.nameDisplay, score: r.score })));
 
     for (const r of ranking) {
@@ -98,22 +94,40 @@ export function initUIHandlers(champs, getState, setState) {
 
   function renderCandidates(candidates) {
     const cont = document.getElementById('candidates');
+    const footer = document.getElementById('candidates-footer');
     const cnt = document.getElementById('candCount');
+    
     cont.innerHTML = '';
+    footer.innerHTML = '';
     cnt.textContent = `(${candidates.length})`;
-    for (const c of candidates) {
+
+    const toDisplay = candidates.slice(0, displayedCount);
+
+    for (const c of toDisplay) {
       const row = document.createElement('div'); row.className = 'candidate';
       const img = document.createElement('img'); addIcon(img, c.nameKey);
       const name = document.createElement('div'); name.className='name'; name.textContent = c.nameDisplay;
       row.appendChild(img); row.appendChild(name);
       cont.appendChild(row);
     }
+
+    if (candidates.length > displayedCount) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.textContent = `Pokaż więcej (${candidates.length - displayedCount} pozostało)`;
+        loadMoreBtn.className = 'secondary load-more-btn';
+        loadMoreBtn.onclick = () => {
+            displayedCount += BATCH_SIZE;
+            renderCandidates(candidates);
+        };
+        footer.appendChild(loadMoreBtn);
+    }
   }
 
   function renderHistory(history) {
     const box = document.getElementById('history');
     box.innerHTML = '';
-    for (const h of history) {
+    for (let i = 0; i < history.length; i++) {
+      const h = history[i];
       const row = document.createElement('div'); row.className='history-row';
       const strong = document.createElement('span'); strong.className='history-name'; strong.textContent = h.guessDisplay;
       row.appendChild(strong);
@@ -134,6 +148,28 @@ export function initUIHandlers(champs, getState, setState) {
         }
         row.appendChild(badge(text));
       }
+      
+      const undoForRowBtn = document.createElement('button');
+      undoForRowBtn.textContent = '❌';
+      undoForRowBtn.className = 'undo-row-btn';
+      undoForRowBtn.title = 'Cofnij i edytuj tę rundę';
+      undoForRowBtn.dataset.index = i;
+
+      undoForRowBtn.addEventListener('click', () => {
+        const indexToRemove = parseInt(undoForRowBtn.dataset.index, 10);
+        const currentHistory = getState().history;
+        const entryToRestore = currentHistory[indexToRemove];
+        
+        const updatedHistory = currentHistory.filter((_, idx) => idx !== indexToRemove);
+        
+        D.log(`Removing history entry at index ${indexToRemove}:`, entryToRestore);
+        setState({ history: updatedHistory });
+
+        guessInput.value = entryToRestore.guessDisplay;
+        setFeedback(entryToRestore.feedback);
+      });
+
+      row.appendChild(undoForRowBtn);
       box.appendChild(row);
     }
   }
@@ -142,12 +178,15 @@ export function initUIHandlers(champs, getState, setState) {
     const s = getState();
     D.group('Recompute');
     D.log('History length:', (s.history||[]).length, s.history);
-    const candidates = filterCandidates(champs, s.history);
-    D.log('Candidates after filter:', candidates.length);
+    
+    displayedCount = BATCH_SIZE;
+    currentCandidates = filterCandidates(champs, s.history);
+
+    D.log('Candidates after filter:', currentCandidates.length);
     D.groupEnd();
 
-    renderTop3(candidates);
-    renderCandidates(candidates);
+    renderTop3(currentCandidates);
+    renderCandidates(currentCandidates);
     renderHistory(s.history);
   }
 

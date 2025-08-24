@@ -27,7 +27,7 @@ function setState(btn, state, isYear=false) {
 /**
  * Initializes feedback buttons and returns functions to manage their state.
  * @param {Document|HTMLElement} root - The root element to search for buttons.
- * @returns {{readFeedback: Function, reset: Function}} An object with functions to read and reset the feedback state.
+ * @returns {{readFeedback: Function, reset: Function, setFeedback: Function}} An object with functions to read, reset, and set the feedback state.
  */
 export function initFeedbackControls(root=document) {
   const triBtns = Array.from(root.querySelectorAll('.fb-cycle'));
@@ -78,6 +78,26 @@ export function initFeedbackControls(root=document) {
     D.log('readFeedback() ->', fb);
     return fb;
   }
+  
+  /**
+   * Sets the state of all feedback buttons based on a feedback object.
+   * @param {Feedback} fb - The feedback object to apply.
+   */
+  function setFeedback(fb) {
+    D.log('setFeedback() <-', fb);
+    if (!fb) return;
+    triBtns.forEach(btn => {
+        const field = btn.dataset.field;
+        if (fb[field]) {
+            setState(btn, fb[field]);
+        }
+    });
+    yearBtns.forEach(btn => {
+        if (fb.releaseYear) {
+            setState(btn, fb.releaseYear, true);
+        }
+    });
+  }
 
   /** Resets all feedback buttons to their initial 'unset' state. */
   function reset() {
@@ -86,5 +106,5 @@ export function initFeedbackControls(root=document) {
     yearBtns.forEach(btn => setState(btn, 'unset', true));
   }
 
-  return { readFeedback, reset };
+  return { readFeedback, reset, setFeedback };
 }

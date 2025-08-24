@@ -2,13 +2,10 @@ import { rankGuesses } from '../logic/scoring.js';
 import { filterCandidates } from '../logic/filter.js';
 import { initAutocomplete } from './autocomplete.js';
 import { D } from '../util/debug.js';
+import { translations } from '../i18n.js';
 
 const BATCH_SIZE = 20;
 
-/**
- * Populates the datalist element for champion autocomplete.
- * @param {Champ[]} champs - The list of all champion objects.
- */
 export function populateDatalist(champs) {
   const dl = document.getElementById('championsList');
   dl.innerHTML = '';
@@ -19,25 +16,12 @@ export function populateDatalist(champs) {
   }
 }
 
-/**
- * Creates a map for quick lookup of champions by their display name.
- * @param {Champ[]} champs - The list of all champion objects.
- * @returns {Map<string, Champ>} A map from normalized display name to champion object.
- */
 function indexByDisplay(champs) {
   const m = new Map();
   for (const c of champs) m.set(c.nameDisplay.toLowerCase(), c);
   return m;
 }
 
-/**
- * Initializes all UI handlers and returns a recompute function.
- * @param {Champ[]} champs - The list of all champion objects.
- * @param {() => any} getState - Function to get the current application state.
- * @param {(p: any) => void} setState - Function to update the application state.
- * @param {(fb: Feedback) => void} setFeedback - Function to set the feedback controls.
- * @returns {{recompute: Function}} An object containing the `recompute` function.
- */
 export function initUIHandlers(champs, getState, setState, setFeedback) {
   const byDisplay = indexByDisplay(champs);
 
@@ -51,7 +35,9 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
   let currentCandidates = [];
 
   resetBtn.addEventListener('click', () => {
-    if (confirm('Na pewno zresetować sesję?')) {
+    const s = getState();
+    const t = translations[s.lang];
+    if (confirm(t.confirmReset)) {
       D.warn('Reset session requested');
       setState({ history: [] });
       window.__resetFeedback();
@@ -80,16 +66,18 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
 
     const ranking = rankGuesses(candidates, candidates, true).slice(0, 3);
     D.log('Top3 ranking:', ranking.map(r => ({ name: r.champ.nameDisplay, score: r.score })));
+    const s = getState();
+    const t = translations[s.lang];
 
     for (const r of ranking) {
       const li = document.createElement('li');
       const wrap = document.createElement('div'); wrap.className = 'top-item';
       const img = document.createElement('img'); addIcon(img, r.champ.nameKey);
-      const span = document.createElement('span'); span.textContent = `${r.champ.nameDisplay} — wynik: ${r.score.toFixed(2)}`;
+      const span = document.createElement('span'); span.textContent = `${r.champ.nameDisplay} — score: ${r.score.toFixed(2)}`;
       wrap.appendChild(img); wrap.appendChild(span); li.appendChild(wrap); top3ol.appendChild(li);
     }
     const N = candidates.length;
-    uniformP.textContent = N > 0 ? `Jednakowe P trafienia dla każdej propozycji: 1/${N.toString()}` : '';
+    uniformP.textContent = N > 0 ? `${t.uniformProbability}: 1/${N.toString()}` : '';
   }
 
   function renderCandidates(candidates) {
@@ -110,10 +98,12 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
       row.appendChild(img); row.appendChild(name);
       cont.appendChild(row);
     }
+    const s = getState();
+    const t = translations[s.lang];
 
     if (candidates.length > displayedCount) {
         const loadMoreBtn = document.createElement('button');
-        loadMoreBtn.textContent = `Pokaż więcej (${candidates.length - displayedCount} pozostało)`;
+        loadMoreBtn.textContent = `${t.showMore} (${candidates.length - displayedCount} ${t.remaining})`;
         loadMoreBtn.className = 'secondary load-more-btn';
         loadMoreBtn.onclick = () => {
             displayedCount += BATCH_SIZE;
@@ -126,6 +116,8 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
   function renderHistory(history) {
     const box = document.getElementById('history');
     box.innerHTML = '';
+    const s = getState();
+    const t = translations[s.lang];
     for (let i = 0; i < history.length; i++) {
       const h = history[i];
       const row = document.createElement('div'); row.className='history-row';
@@ -136,7 +128,7 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
       const m = new Map(Object.entries(h.feedback));
       const order = ['gender','positions','species','resource','rangeType','regions','releaseYear'];
       const labels = {
-        gender:'Płeć', positions:'Pozycje', species:'Gatunek', resource:'Zasób', rangeType:'Zasięg', regions:'Regiony', releaseYear:'Rok'
+        gender: t.gender, positions: t.positions, species: t.species, resource: t.resource, rangeType: t.rangeType, regions: t.regions, releaseYear: t.year
       };
       for (const k of order) {
         const v = m.get(k);
@@ -192,9 +184,11 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
 
   submitBtn.addEventListener('click', () => {
     const c = findByDisplay(guessInput.value);
+    const s = getState();
+    const t = translations[s.lang];
     if (!c) {
       D.warn('Guess not found for input:', guessInput.value);
-      alert('Wybierz poprawną nazwę championa z listy.');
+      alert(t.invalidChampion);
       return;
     }
     const fb = window.__readFeedback();
@@ -202,7 +196,7 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
 
     const vals = Object.values(fb);
     if (vals.every(v => v === 'unset')) {
-      alert('Ustaw feedback (kliknij kropki).');
+      alert(t.setFeedback);
       return;
     }
 

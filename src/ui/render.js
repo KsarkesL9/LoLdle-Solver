@@ -31,17 +31,32 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
   const submitBtn = document.getElementById('submitGuess');
   const resetBtn = document.getElementById('resetBtn');
 
-  let displayedCount = BATCH_SIZE;
+  // Modal handlers
+  const resetModal = document.getElementById('resetModal');
+  const cancelResetBtn = document.getElementById('cancelReset');
+  const confirmResetBtn = document.getElementById('confirmReset');
+
   let currentCandidates = [];
 
   resetBtn.addEventListener('click', () => {
-    const s = getState();
-    const t = translations[s.lang];
-    if (confirm(t.confirmReset)) {
-      D.warn('Reset session requested');
-      setState({ history: [] });
-      window.__resetFeedback();
-      guessInput.value = '';
+    resetModal.style.display = 'flex';
+  });
+  
+  cancelResetBtn.addEventListener('click', () => {
+    resetModal.style.display = 'none';
+  });
+  
+  confirmResetBtn.addEventListener('click', () => {
+    D.warn('Reset session confirmed');
+    setState({ history: [] });
+    window.__resetFeedback();
+    guessInput.value = '';
+    resetModal.style.display = 'none';
+  });
+  
+  window.addEventListener('click', (event) => {
+    if (event.target === resetModal) {
+      resetModal.style.display = 'none';
     }
   });
 
@@ -82,14 +97,12 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
 
   function renderCandidates(candidates) {
     const cont = document.getElementById('candidates');
-    const footer = document.getElementById('candidates-footer');
     const cnt = document.getElementById('candCount');
     
     cont.innerHTML = '';
-    footer.innerHTML = '';
     cnt.textContent = `(${candidates.length})`;
 
-    const toDisplay = candidates.slice(0, displayedCount);
+    const toDisplay = candidates.slice(0, BATCH_SIZE);
 
     for (const c of toDisplay) {
       const row = document.createElement('div'); row.className = 'candidate';
@@ -97,19 +110,6 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
       const name = document.createElement('div'); name.className='name'; name.textContent = c.nameDisplay;
       row.appendChild(img); row.appendChild(name);
       cont.appendChild(row);
-    }
-    const s = getState();
-    const t = translations[s.lang];
-
-    if (candidates.length > displayedCount) {
-        const loadMoreBtn = document.createElement('button');
-        loadMoreBtn.textContent = `${t.showMore} (${candidates.length - displayedCount} ${t.remaining})`;
-        loadMoreBtn.className = 'secondary load-more-btn';
-        loadMoreBtn.onclick = () => {
-            displayedCount += BATCH_SIZE;
-            renderCandidates(candidates);
-        };
-        footer.appendChild(loadMoreBtn);
     }
   }
 
@@ -171,7 +171,6 @@ export function initUIHandlers(champs, getState, setState, setFeedback) {
     D.group('Recompute');
     D.log('History length:', (s.history||[]).length, s.history);
     
-    displayedCount = BATCH_SIZE;
     currentCandidates = filterCandidates(champs, s.history);
 
     D.log('Candidates after filter:', currentCandidates.length);

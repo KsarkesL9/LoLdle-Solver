@@ -24,6 +24,8 @@ export const translations = {
     showMore: 'Pokaż więcej',
     remaining: 'pozostało',
     language: 'Język',
+    cancel: 'Anuluj',
+    reset: 'Zresetuj',
   },
   en: {
     title: 'Loldle Classic — Solver',
@@ -50,5 +52,7 @@ export const translations = {
     showMore: 'Show More',
     remaining: 'remaining',
     language: 'Language',
+    cancel: 'Cancel',
+    reset: 'Reset',
   },
 };

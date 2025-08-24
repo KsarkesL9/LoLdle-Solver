@@ -9,6 +9,7 @@ So basically this is a little tool I hacked together to make solving **Loldle Cl
 - Suggests guesses: it actually tries to figure out which champs are the smartest guesses to make next. Bit of math behind it (basically tries to keep the remaining options as small as possible).
 - Keeps history: your guesses aren’t lost, you can scroll back and see what you already tried.
 - Remembers session: uses localStorage so if you refresh/come back later, you don’t lose progress.
+- Language switcher: Added a button to flip between Polish and English, just in case.
 
 
 ## How it’s set up
@@ -21,6 +22,7 @@ So basically this is a little tool I hacked together to make solving **Loldle Cl
 - `state/`: saving and loading stuff from localStorage.
 - `ui/`: renders the guesses and handles clicks.
 - `util/`: random helpers.
+- `i18n.js`: holds the translations for the language switcher.
 
 
 That’s it. Nothing too crazy, just a helper for people who like solving Loldle a bit quicker without racking their brains too much.
